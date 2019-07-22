@@ -1,0 +1,3 @@
+/scratch/thanv/VasculatureAssessment/AdaptiveThreshold/build/CMakeFiles/rebuild_cache.dir
+/scratch/thanv/VasculatureAssessment/AdaptiveThreshold/build/CMakeFiles/edit_cache.dir
+/scratch/thanv/VasculatureAssessment/AdaptiveThreshold/build/CMakeFiles/AdaptiveThreshold.dir
