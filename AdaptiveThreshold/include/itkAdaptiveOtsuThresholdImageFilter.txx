@@ -158,11 +158,11 @@ AdaptiveOtsuThresholdImageFilter<TInputImage, TOutputImage>
     roi->Update();
 
     OtsuThresholdPointer otsu = OtsuThresholdType::New();
-    otsu->SetImage( roi->GetOutput() );
+    otsu->SetInput( roi->GetOutput() );
     otsu->SetNumberOfHistogramBins(m_NumberOfHistogramBins);
-    otsu->Compute();
+    otsu->Update();
 
-    V[0] = static_cast<InputCoordType>( otsu->GetThreshold() );
+    V[0] = static_cast<InputCoordType>( otsu->GetThresholds()[0] );
     pointdatacontainer->SetElement( i, V );
   }
 

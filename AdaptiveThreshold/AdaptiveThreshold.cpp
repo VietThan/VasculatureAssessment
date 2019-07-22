@@ -25,8 +25,8 @@ using namespace itk;
 //helper functions
 std::string makeInputFileName (const std::string &filename, const std::string &filetype);
 std::string makeOutputFileName (const std::string &filename, const std::string &filetype, 
-				const float &alpha, const float &beta, const float &gamma, 
-				const double &min, const double &max, const unsigned int &step);
+				const double &radius, const unsigned int &numOfSamples, 
+				const unsigned int & numOfLevels, const unsigned int &numOfControlPts);
 
 
 template <typename T> std::string returnPointString(const T &number);
@@ -41,40 +41,36 @@ template <typename T> std::string returnPointString(const T &number);
 int main(int argc, char * argv []){
 	std::cout << "Starting Hessian filter" << std::endl;
 
-	if (argc > 9){
+	if (argc > 7){
 		std::cout << "too many arguments" << std::endl;
 		return EXIT_FAILURE;
 	}
 
 	// setting up arguments
 	std::string filename, filetype;
-	float alpha, beta, gamma;
-	double sigmaMinimum, sigmaMaximum;
-	unsigned int numberOfSigmaSteps;
+	double radius;
+	unsigned int numOfSamples, numOfLevels, numOfControlPts;
+	
 	// constexpr, computation at compile time
 	constexpr unsigned int Dimension = 3;
 	constexpr float desiredMinimum = 0.0;
 	constexpr float desiredMaximum = 255.0;
 	
-	if (argc == 9){
+	if (argc == 7){
 		filename = argv[1];
 		filetype = argv[2];
-		alpha = std::stof(argv[3]);
-		beta = std::stof(argv[4]);
-		gamma = std::stof(argv[5]);
-		sigmaMinimum = std::atof(argv[6]);
-		sigmaMaximum = std::atof(argv[7]);
-		numberOfSigmaSteps = atoi(argv[8]);
+		radius = std::stof(argv[3]);
+		numOfSamples = std::atoi(argv[4]);
+		numOfLevels = std::atoi(argv[5]);
+		numOfControlPts = std::atoi(argv[6]);
 	} else {
 		std::cout << "Not enough arguments, went with default" << std::endl;
-		filename = "Smallfield_OCT_Angiography_Volume_fovea"; //filename in data/
+		filename = "volume"; //filename in data/
 		filetype = ".nii";
-		alpha = 0.8;
-		beta = 1;
-		gamma = 250;
-		sigmaMinimum = 0.5;
-		sigmaMaximum = 12;
-		numberOfSigmaSteps = 11;
+		radius = 20;
+		numOfSamples = 1000;
+		numOfLevels = 3;
+		numOfControlPts = 30;
 	}
 
 	//timing
@@ -88,7 +84,7 @@ int main(int argc, char * argv []){
 
 
   	
-	std::string outputFileName = makeOutputFileName(filename, filetype, alpha, beta, gamma, sigmaMinimum, sigmaMaximum, numberOfSigmaSteps);
+	std::string outputFileName = makeOutputFileName(filename, filetype, radius, numOfSamples, numOfLevels, numOfControlPts);
 
 
 	//Setting up the image reader of the particular type
@@ -99,64 +95,54 @@ int main(int argc, char * argv []){
 	//Setting up the reader
   	ReaderType::Pointer reader = ReaderType::New();
   	reader->SetFileName( inputFileName );
-  	reader->Update();
+  	try {
+    	reader->Update();
+    	} catch ( itk::ExceptionObject & error ){
+    	std::cerr << "Error: " << error << std::endl;
+    	return EXIT_FAILURE;
+    	}
 
  	stop = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << duration.count() << " milliseconds for setting image and reader"<<std::endl;
 
+
+	///////////////////////////////////////////
+	//           SET FILTER HERE             //
+	
+	typedef ImageType::SizeType SizeType;
+	typedef ImageType::SpacingType SpacingType;
+	typedef SizeType::SizeValueType SizeValueType;
+	typedef itk::AdaptiveOtsuThresholdImageFilter<ImageType, ImageType> AdaptFilterType;
+	
 	ImageType::Pointer image = reader->GetOutput();
 	ImageType::RegionType region = image->GetLargestPossibleRegion();
 	ImageType::SizeType size = region.GetSize();
+	SpacingType spacing = image->GetSpacing();
 
+	SizeType m_radius;
+	for (unsigned int i = 0; i < Dimension; ++i){
+		m_radius[i] = static_cast<SizeValueType>( radius/spacing[i] );
+	}
 
-  	using HessianPixelType = itk::SymmetricSecondRankTensor< float, Dimension >;
-  	using HessianImageType = itk::Image< HessianPixelType, Dimension >;
-  	using ObjectnessFilterType = itk::HessianToObjectnessMeasureImageFilter< HessianImageType, ImageType >;
-  	ObjectnessFilterType::Pointer objectnessFilter = ObjectnessFilterType::New();
-  	objectnessFilter->SetBrightObject( true );
-  	objectnessFilter->SetScaleObjectnessMeasure( false );
-  	objectnessFilter->SetAlpha( alpha );
-  	objectnessFilter->SetBeta( beta );
-  	objectnessFilter->SetGamma( gamma );
+	AdaptFilterType::Pointer adaptFilter = AdaptFilterType::New();
+	adaptFilter->SetInput( reader->GetOutput() );
+	adaptFilter->SetInsideValue( desiredMaximum );
+	adaptFilter->SetOutsideValue( desiredMinimum );
+	adaptFilter->SetNumberOfHistogramBins( 256 );
+	adaptFilter->SetNumberOfControlPoints( numOfControlPts );
+	adaptFilter->SetNumberOfLevels( numOfLevels );
+	adaptFilter->SetNumberOfSamples( numOfSamples );
+	adaptFilter->SetRadius( m_radius );
+	adaptFilter->Update();
 
- 	stop = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	std::cout << duration.count() << " milliseconds for setting Hessian output image"<<std::endl;
-
-
-  	using MultiScaleEnhancementFilterType = itk::MultiScaleHessianBasedMeasureImageFilter< ImageType, HessianImageType, ImageType >;
-  	MultiScaleEnhancementFilterType::Pointer multiScaleEnhancementFilter = MultiScaleEnhancementFilterType::New();
-  	multiScaleEnhancementFilter->SetInput( reader->GetOutput() );
-  	multiScaleEnhancementFilter->SetHessianToMeasureFilter( objectnessFilter );
-  	multiScaleEnhancementFilter->SetSigmaStepMethodToLogarithmic();
-  	multiScaleEnhancementFilter->SetSigmaMinimum( sigmaMinimum );
-  	multiScaleEnhancementFilter->SetSigmaMaximum( sigmaMaximum );
-  	multiScaleEnhancementFilter->SetNumberOfSigmaSteps( numberOfSigmaSteps );
-
- 	stop = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	std::cout << duration.count() << " milliseconds for setting up the Hessian filter" <<std::endl;
-
-	//
-  	using OutputImageType = itk::Image< float, Dimension >;
-  	using RescaleFilterType = itk::RescaleIntensityImageFilter< ImageType, OutputImageType >;
-  	RescaleFilterType::Pointer rescaleFilter = RescaleFilterType::New();
-  	rescaleFilter->SetInput( multiScaleEnhancementFilter->GetOutput() );
-	
-	//rescale to 0 and 255 for output
-	rescaleFilter->SetOutputMinimum(desiredMinimum);
-	rescaleFilter->SetOutputMaximum(desiredMaximum);
-
- 	stop = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	std::cout << duration.count() << " milliseconds for setting min max intensity"<< std::endl;
+	///////////////////////////////////////////
 
 	//Setting up the output writer
-  	using WriterType = itk::ImageFileWriter< OutputImageType >;//setting up type for writer
+  	using WriterType = itk::ImageFileWriter< ImageType >;//setting up type for writer
   	WriterType::Pointer writer = WriterType::New();//initialize new writer pointer
   	writer->SetFileName( outputFileName );//set filename for writer
-  	writer->SetInput( rescaleFilter->GetOutput() );//
+  	writer->SetInput( adaptFilter->GetOutput() );//
 	//writer->SetUseCompression( true );
 	
 	stop = std::chrono::high_resolution_clock::now();
@@ -189,24 +175,19 @@ std::string makeInputFileName (const std::string &filename, const std::string &f
 }
 
 //Creating the output filename for a nifti
-std::string makeOutputFileName  (const std::string &filename, const std::string &filetype, 
-				const float &alpha, const float &beta, const float &gamma, 
-				const double &min, const double &max, const unsigned int &step){
+std::string makeOutputFileName   (const std::string &filename, const std::string &filetype, 
+				const double &radius, const unsigned int &numOfSamples, 
+				const unsigned int & numOfLevels, const unsigned int &numOfControlPts){
 	std::string OutputFileName = "../output/";
 	OutputFileName.append(filename);
-	OutputFileName.append("_Hessian");
+	OutputFileName.append("_AdapThresh").append("_");
+	OutputFileName.append(returnPointString(radius));
 	OutputFileName.append("_");
-	OutputFileName.append(returnPointString(alpha));
+	OutputFileName.append(std::to_string(numOfSamples));
 	OutputFileName.append("_");
-	OutputFileName.append(returnPointString(beta));
+	OutputFileName.append(std::to_string(numOfLevels));
 	OutputFileName.append("_");
-	OutputFileName.append(returnPointString(gamma));
-	OutputFileName.append("_");
-	OutputFileName.append(returnPointString(min));
-	OutputFileName.append("_");
-	OutputFileName.append(returnPointString(max));
-	OutputFileName.append("_");
-	OutputFileName.append(std::to_string(step));
+	OutputFileName.append(std::to_string(numOfControlPts));
 	OutputFileName.append(filetype);
 	return OutputFileName;
 }
