@@ -124,6 +124,7 @@ int main(int argc, char * argv []){
 	for (unsigned int i = 0; i < Dimension; ++i){
 		m_radius[i] = static_cast<SizeValueType>( radius/spacing[i] );
 	}
+	std::cout << "m_radius: " << m_radius << "\n";
 
 	AdaptFilterType::Pointer adaptFilter = AdaptFilterType::New();
 	adaptFilter->SetInput( reader->GetOutput() );
