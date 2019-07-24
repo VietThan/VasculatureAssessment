@@ -14,3 +14,7 @@ data/
 
 # ignore output
 output/
+
+# ignore temp files
+*.swp
+*.swo
