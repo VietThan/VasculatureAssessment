@@ -28,14 +28,15 @@ std::string makeOutputFileName (const std::string &filename, const std::string &
 
 
 
-// 4 arguments:
+// 5 arguments:
 // 1 - filename
 // 2 - filetype
 // 3 - algorithm
+// 4 - radius
 int main(int argc, char * argv []){
 	std::cout << "Starting White Top Hat thresholding" << std::endl;
 
-	if (argc > 4){
+	if (argc > 5){
 		std::cout << "too many arguments" << std::endl;
 		return EXIT_FAILURE;
 	}
@@ -43,21 +44,24 @@ int main(int argc, char * argv []){
 	// setting up arguments
 	std::string filename, filetype;
 	unsigned int algorithm;
+	double radius
 	
 	// constexpr, computation at compile time
 	constexpr unsigned int Dimension = 3;
 	constexpr float desiredMinimum = 0.0;
 	constexpr float desiredMaximum = 255.0;
 	
-	if (argc == 4){
+	if (argc == 5){
 		filename = argv[1];
 		filetype = argv[2];
-		algorithm = std::stof(argv[3]);
+		algorithm = std::atoi(argv[3]);
+		radius = std::stof(argv[4]);
 	} else {
 		std::cout << "Not enough arguments, went with default" << std::endl;
 		filename = "volume_norm_tif"; //filename in data/
 		filetype = ".nii";
 		algorithm = 0;
+		radius = 20;
 	}
 
 	//timing
@@ -100,8 +104,8 @@ int main(int argc, char * argv []){
 	typedef ImageType::SizeType SizeType;
 	typedef ImageType::SpacingType SpacingType;
 	typedef SizeType::SizeValueType SizeValueType;
-	typedef itk::WhiteTopHatImageFilter<ImageType, ImageType> AdaptFilterType;
-	
+	typedef itk::WhiteTopHatImageFilter<ImageType, ImageType> WhiteHatFilterType;
+
 	ImageType::Pointer image = reader->GetOutput();
 	ImageType::RegionType region = image->GetLargestPossibleRegion();
 	ImageType::SizeType size = region.GetSize();
@@ -113,16 +117,13 @@ int main(int argc, char * argv []){
 	}
 	std::cout << "m_radius: " << m_radius << "\n";
 
-	AdaptFilterType::Pointer adaptFilter = AdaptFilterType::New();
-	adaptFilter->SetInput( reader->GetOutput() );
-	adaptFilter->SetInsideValue( desiredMaximum );
-	adaptFilter->SetOutsideValue( desiredMinimum );
-	adaptFilter->SetNumberOfHistogramBins( 256 );
-	adaptFilter->SetNumberOfControlPoints( numOfControlPts );
-	adaptFilter->SetNumberOfLevels( numOfLevels );
-	adaptFilter->SetNumberOfSamples( numOfSamples );
-	adaptFilter->SetRadius( m_radius );
-	adaptFilter->Update();
+	WhiteHatFilterType::Pointer hatFilter = WhiteHatFilterType::New();
+	hatFilter->SetInput( reader->GetOutput() );
+	hatFilter->SetRadius( m_radius );
+	hatFilter->SetAlgorithm( algorithm );
+	// hatFilter->ForceAlgorithmOn();
+	// hatFilter->SafeBorderOn();
+	hatFilter->Update();
 
 	///////////////////////////////////////////
 
