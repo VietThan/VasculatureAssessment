@@ -12,6 +12,7 @@
 #include "itkExtractImageFilter.h"
 
 #include "itkWhiteTopHatImageFilter.h"
+#include "itkBinaryBallStructuringElement.h"
 
 #include <string>
 #include <iostream>
@@ -44,7 +45,7 @@ int main(int argc, char * argv []){
 	// setting up arguments
 	std::string filename, filetype;
 	unsigned int algorithm;
-	double radius
+	double radius;
 	
 	// constexpr, computation at compile time
 	constexpr unsigned int Dimension = 3;
@@ -75,7 +76,7 @@ int main(int argc, char * argv []){
 
 
   	
-	std::string outputFileName = makeOutputFileName(filename, filetype, radius, numOfSamples, numOfLevels, numOfControlPts);
+	std::string outputFileName = makeOutputFileName(filename, filetype, radius);
 
 
 	//Setting up the image reader of the particular type
@@ -101,10 +102,11 @@ int main(int argc, char * argv []){
 	///////////////////////////////////////////
 	//           SET FILTER HERE             //
 	
-	typedef ImageType::SizeType SizeType;
-	typedef ImageType::SpacingType SpacingType;
-	typedef SizeType::SizeValueType SizeValueType;
-	typedef itk::WhiteTopHatImageFilter<ImageType, ImageType> WhiteHatFilterType;
+	using SizeType = ImageType::SizeType;
+	using SpacingType = ImageType::SpacingType;
+	using SizeValueType = SizeType::SizeValueType;
+	using StructuringElementType = itk::BinaryBallStructuringElement<PixelType, Dimension>;
+	using WhiteHatFilterType = itk::WhiteTopHatImageFilter<ImageType, ImageType, StructuringElementType >;
 
 	ImageType::Pointer image = reader->GetOutput();
 	ImageType::RegionType region = image->GetLargestPossibleRegion();
@@ -131,7 +133,7 @@ int main(int argc, char * argv []){
   	using WriterType = itk::ImageFileWriter< ImageType >;//setting up type for writer
   	WriterType::Pointer writer = WriterType::New();//initialize new writer pointer
   	writer->SetFileName( outputFileName );//set filename for writer
-  	writer->SetInput( adaptFilter->GetOutput() );//
+  	writer->SetInput( hatFilter->GetOutput() );//
 	//writer->SetUseCompression( true );
 	
 	stop = std::chrono::high_resolution_clock::now();
