@@ -113,6 +113,10 @@ int main(int argc, char * argv []){
 	ImageType::SizeType size = region.GetSize();
 	SpacingType spacing = image->GetSpacing();
 
+ 	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	std::cout << duration.count() << " milliseconds for setting up White Hat"<<std::endl;
+
 	SizeType m_radius;
 	for (unsigned int i = 0; i < Dimension; ++i){
 		m_radius[i] = static_cast<SizeValueType>( radius/spacing[i] );
@@ -125,6 +129,10 @@ int main(int argc, char * argv []){
 	hatFilter->SetAlgorithm( algorithm );
 	// hatFilter->ForceAlgorithmOn();
 	// hatFilter->SafeBorderOn();
+
+ 	stop = std::chrono::high_resolution_clock::now();
+	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	std::cout << duration.count() << " milliseconds just before White Hat update"<<std::endl;
 	hatFilter->Update();
 
 	///////////////////////////////////////////
