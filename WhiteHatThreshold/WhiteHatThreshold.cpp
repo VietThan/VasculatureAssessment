@@ -62,7 +62,7 @@ int main(int argc, char * argv []){
 		filename = "volume_norm_tif"; //filename in data/
 		filetype = ".nii";
 		algorithm = 0;
-		radius = 20;
+		radius = 8;
 	}
 
 	//timing

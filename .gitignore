@@ -11,6 +11,8 @@ data/
 
 # ignore .sh files
 *.sh
+*.log
+*.out
 
 # ignore output
 output/
