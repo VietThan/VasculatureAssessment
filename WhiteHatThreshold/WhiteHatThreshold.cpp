@@ -25,8 +25,9 @@ using namespace itk;
 //helper functions
 std::string makeInputFileName (const std::string &filename, const std::string &filetype);
 std::string makeOutputFileName (const std::string &filename, const std::string &filetype, 
-				const unsigned int &algorithm);
+				const unsigned int &algorithm, const double &radius);
 
+template <typename T> std::string returnPointString(const T &number);
 
 
 // 5 arguments:
@@ -76,7 +77,7 @@ int main(int argc, char * argv []){
 
 
   	
-	std::string outputFileName = makeOutputFileName(filename, filetype, radius);
+	std::string outputFileName = makeOutputFileName(filename, filetype, algorithm, radius);
 
 
 	//Setting up the image reader of the particular type
@@ -133,7 +134,6 @@ int main(int argc, char * argv []){
  	stop = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	std::cout << duration.count() << " milliseconds just before White Hat update"<<std::endl;
-	hatFilter->Update();
 
 	///////////////////////////////////////////
 
@@ -175,14 +175,23 @@ std::string makeInputFileName (const std::string &filename, const std::string &f
 
 //Creating the output filename for a nifti
 std::string makeOutputFileName   (const std::string &filename, const std::string &filetype, 
-				const unsigned int &algorithm){
+				const unsigned int &algorithm, const double &radius){
 	std::string OutputFileName = "../output/";
 	OutputFileName.append(filename);
 	OutputFileName.append("_WhiteHat").append("_");
 	OutputFileName.append(std::to_string(algorithm));
+	OutputFileName.append(returnPointString(radius));
 	OutputFileName.append(filetype);
 	return OutputFileName;
 }
 
 
+template <typename T> std::string returnPointString(const T &number){
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(1) << number;
+    std::string s = stream.str();
+
+    s.replace(s.find('.'), 1, "p");
+    return s;
+}
 
