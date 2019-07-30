@@ -1,6 +1,6 @@
 # Scripts for quantitative assesment of (retinal) microvasculature<br>
 
-<p align="center"><img src="https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png" width=500></p><br>
+<p align="center"><img src="https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png" width=500>Representative OMAG images to illustrate the quantitative analysis algorithm. (a) Original en face OMAG image. (b) Vessel area map, a binarized vasculature image using hessian filter and adaptive threshold. This image is used for VAD, VDI, and VCI quantification. (c) Vessel skeleton map, which is obtained by iteratively deleting the pixels in the outer boundary of the vessel area map until one pixel remained along the width direction of the vessels. This image is used for VSD and VDI quantification. (d)Vessel perimeter map, which is obtain by detecting the edge of vessels in the vessel area map and deleting pixels that are not on the edge of vessels. This image is used for VPI and VCI quantification.</p><br>
 
 ## General Information<br>
 ### Theoretical foundation<br>
