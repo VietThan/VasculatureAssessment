@@ -1,6 +1,6 @@
 # Scripts for quantitative assesment of (retinal) microvasculature<br>
 
-![Vasculature assesment picture from the original paper](https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png)<br>
+![Vasculature assesment picture from the original paper](https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png){:height="50%" width="50%"}<br>
 
 ## General Information<br>
 ### Theoretical foundation<br>
