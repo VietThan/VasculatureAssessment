@@ -10,8 +10,8 @@
   	<img src="https://img.shields.io/badge/compiler-GCC 5.4.0-green?style=for-the-badge"
 			 alt="compiler">
 	<img src="https://img.shields.io/badge/builder-cmake 3.7.1-green?style=for-the-badge"
-			 alt="compiler">
-	<img src="https://img.shields.io/badge/library-ITK 4.12.2-Python2.7.12-critical?style=for-the-badge"
+			 alt="builder">
+	<img src="https://img.shields.io/badge/library-ITK 4.12.2|Python2.7.12-critical?style=for-the-badge"
 			 alt="compiler">
 </p>
 
