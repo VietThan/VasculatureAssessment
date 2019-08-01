@@ -50,7 +50,7 @@ Arguments: No arguments
 ## More
 
 ## Author and Acknowledgements
-Author: Viet Than, Department of EECS, Vanderbilt University, US.
+Author: Viet Than, Department of EECS, Vanderbilt University, US.<br>
 Supervisor: Ipek Oguz, Prof. Department of EECS, Vanderbilt University, US.
 
 With the help of the Medical Image Computing Lab.
