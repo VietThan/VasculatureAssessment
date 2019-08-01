@@ -5,9 +5,13 @@
 <p align="left">
 	<img src="https://img.shields.io/badge/platform-ubuntu-blueviolet?style=for-the-badge"
 			 alt="platform">
-	<img src="https://img.shields.io/badge/language-C++-green?style=for-the-badge"
+	<img src="https://img.shields.io/badge/language-C++11-green?style=for-the-badge"
 			 alt="language">
-  <img src="https://img.shields.io/badge/compiler-GCC-green?style=for-the-badge"
+  	<img src="https://img.shields.io/badge/compiler-GCC 5.4.0-green?style=for-the-badge"
+			 alt="compiler">
+	<img src="https://img.shields.io/badge/builder-cmake 3.7.1-green?style=for-the-badge"
+			 alt="compiler">
+	<img src="https://img.shields.io/badge/library-ITK 4.12.2-Python2.7.12-critical?style=for-the-badge"
 			 alt="compiler">
 </p>
 
@@ -39,8 +43,14 @@ Arguments: ```./WhiteHatThreshold [filename] [filetype] [algorithm] [radius]```
 
 Default:   ```./WhiteHatThreshold volume_norm_tif .nii 0 8```
 
-### MatAdaptThresh<br>
-Complete. Micro script on MATLAB to make use of its adaptive thresholding and image binarizing functions. Playing around with parameters currently gives neighborhood sizes of [1 1 1] very effective.<br>
->Arguments: No arguments
-## More<br>
+### MatAdaptThresh
+Complete. Micro script on MATLAB to make use of its adaptive thresholding and image binarizing functions. Playing around with parameters currently gives neighborhood sizes of [1 1 1] very effective.<br><br>
+Arguments: No arguments
 
+## More
+
+## Author and Acknowledgements
+Author: Viet Than, Department of EECS, Vanderbilt University, US.
+Supervisor: Ipek Oguz, Prof. Department of EECS, Vanderbilt University, US.
+
+With the help of the Medical Image Computing Lab.
