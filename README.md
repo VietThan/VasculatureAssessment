@@ -1,6 +1,15 @@
 # Scripts for quantitative assesment of (retinal) microvasculature<br>
 
-<p align="center"><img src="https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png" width=500></p><br>
+<p align="center"><img src="https://www.spiedigitallibrary.org/ContentImages/Journals/JBOPFO/21/6/066008/FigureImages/JBO_21_6_066008_f002.png" width=500></p>
+
+<p align="left">
+	<img src="https://img.shields.io/badge/platform-ubuntu-blueviolet?style=for-the-badge"
+			 alt="platform">
+	<img src="https://img.shields.io/badge/language-C++-green?style=for-the-badge"
+			 alt="language">
+  <img src="https://img.shields.io/badge/compiler-GCC-green?style=for-the-badge"
+			 alt="compiler">
+</p>
 
 ## General Information<br>
 ### Theoretical foundation<br>
@@ -14,16 +23,22 @@ Read more about ITK at <a href="https://itk.org/">itk.org</a>
 * For input, `type` means the file type associated with `filename`.
 * The scrips make output filenames themselves by using the input filename and append useful information about what happened.
 * If the program runs with more arguments than specified, the program will `EXIT_FAILURE`. 
-* If the program runs with less arguments than specified, default arguments will be ran.<br>
-## Scripts<br>
-### AdaptiveThreshold<br>
-Complete/Abandoned. Implementing adaptive threshold filter. Abandoned because underlying filter is deprecated and suspect not implementing adaptive threshold correctly<br>
-### WhiteHatThreshold<br>
+* If the program runs with less arguments than specified, default arguments will be ran.
+
+## Scripts
+
+### AdaptiveThreshold
+
+Complete/Abandoned. Implementing adaptive threshold filter. Abandoned because underlying filter is deprecated and suspect not implementing adaptive threshold correctly
+
+### WhiteHatThreshold
+
 Complete/Abandoned. Implementing the white hat filter, bringing out local maxima of bright objects on dark background. The filter isn't working correctly, output remained the same as input.<br>
->Arguments:<br>
->`./WhiteHatThreshold [filename] [filetype] [algorithm] [radius]`<br>
->Default:<br>
->`./WhiteHatThreshold volume_norm_tif .nii 0 8`<br>
+
+Arguments: ```./WhiteHatThreshold [filename] [filetype] [algorithm] [radius]```
+
+Default:   ```./WhiteHatThreshold volume_norm_tif .nii 0 8```
+
 ### MatAdaptThresh<br>
 Complete. Micro script on MATLAB to make use of its adaptive thresholding and image binarizing functions. Playing around with parameters currently gives neighborhood sizes of [1 1 1] very effective.<br>
 >Arguments: No arguments
